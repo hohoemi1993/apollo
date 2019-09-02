@@ -66,6 +66,7 @@ public class ItemController {
   public ItemDTO createItem(@PathVariable String appId, @PathVariable String env,
                             @PathVariable String clusterName, @PathVariable String namespaceName,
                             @RequestBody ItemDTO item) {
+    // 校验 Item 格式正确
     checkModel(isValidItem(item));
 
     //protect
@@ -76,7 +77,7 @@ public class ItemController {
     item.setDataChangeLastModifiedBy(userId);
     item.setDataChangeCreatedTime(null);
     item.setDataChangeLastModifiedTime(null);
-
+    // 保存 Item 到 Admin Service
     return configService.createItem(appId, Env.valueOf(env), clusterName, namespaceName, item);
   }
 
@@ -85,6 +86,7 @@ public class ItemController {
   public void updateItem(@PathVariable String appId, @PathVariable String env,
                          @PathVariable String clusterName, @PathVariable String namespaceName,
                          @RequestBody ItemDTO item) {
+
     checkModel(isValidItem(item));
 
     String username = userInfoHolder.getUser().getUserId();

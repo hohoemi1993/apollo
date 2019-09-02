@@ -12,12 +12,20 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 
 
-public class ConfigChangeContentBuilder {
+public class  ConfigChangeContentBuilder {
 
   private static final Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
-
+  /**
+   * 创建 Item 集合
+   */
   private List<Item> createItems = new LinkedList<>();
+  /**
+   * 更新 Item 集合
+   */
   private List<ItemPair> updateItems = new LinkedList<>();
+  /**
+   * 删除 Item 集合
+   */
   private List<Item> deleteItems = new LinkedList<>();
 
 
@@ -49,6 +57,7 @@ public class ConfigChangeContentBuilder {
 
   public String build() {
     //因为事务第一段提交并没有更新时间,所以build时统一更新
+    // 分布式事务:  投票阶段 和 事务提交阶段
     Date now = new Date();
 
     for (Item item : createItems) {

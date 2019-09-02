@@ -52,7 +52,7 @@ public class AdminServiceAPI {
     }
 
     public AppDTO createApp(Env env, AppDTO app) {
-      return restTemplate.post(env, "apps", app, AppDTO.class);
+      return restTemplate.post(env, "a  pps", app, AppDTO.class);
     }
 
     public void updateApp(Env env, AppDTO app) {

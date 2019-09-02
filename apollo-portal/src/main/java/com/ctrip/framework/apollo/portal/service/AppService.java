@@ -110,28 +110,29 @@ public class AppService {
 
   @Transactional
   public App createAppInLocal(App app) {
+    // 检查AppId是否已经存在了
     String appId = app.getAppId();
     App managedApp = appRepository.findByAppId(appId);
 
     if (managedApp != null) {
       throw new BadRequestException(String.format("App already exists. AppId = %s", appId));
     }
-
+    // 检查用户信息
     UserInfo owner = userService.findByUserId(app.getOwnerName());
     if (owner == null) {
       throw new BadRequestException("Application's owner not exist.");
     }
     app.setOwnerEmail(owner.getEmail());
-
+    // 设置APP 的创建人和修改人为当前用户
     String operator = userInfoHolder.getUser().getUserId();
     app.setDataChangeCreatedBy(operator);
     app.setDataChangeLastModifiedBy(operator);
-
+    // 保存到数据库中
     App createdApp = appRepository.save(app);
-
+    // 创建app默认的命名空间 application
     appNamespaceService.createDefaultAppNamespace(appId);
+    // 初始化 app角色
     roleInitializationService.initAppRoles(createdApp);
-
     Tracer.logEvent(TracerEventType.CREATE_APP, appId);
 
     return createdApp;

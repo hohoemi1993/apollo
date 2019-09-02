@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * users can modify config in text mode.so need resolve text.
+ * 配置文本解析器接口
  */
 public interface ConfigTextResolver {
 

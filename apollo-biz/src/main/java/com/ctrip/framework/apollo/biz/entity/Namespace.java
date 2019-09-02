@@ -9,6 +9,17 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+/**
+ * Namespace 类型有三种：
+ *
+ * 私有类型：私有类型的 Namespace 具有 private 权限。
+ * 公共类型：公共类型的 Namespace 具有 public 权限。
+ *          公共类型的 Namespace 相当于游离于应用之外的配置，且通过 Namespace 的名称去标识公共 Namespace ，
+ *          所以公共的 Namespace 的名称必须全局唯一。
+ * 关联类型：关联类型又可称为继承类型，关联类型具有 private 权限。
+ *          关联类型的Namespace 继承于公共类型的Namespace，
+ *          用于覆盖公共 Namespace 的某些配置。
+ */
 @Entity
 @Table(name = "Namespace")
 @SQLDelete(sql = "Update Namespace set isDeleted = 1 where id = ?")

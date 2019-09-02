@@ -27,13 +27,21 @@ public class AppNamespace extends BaseEntity {
   @Column(name = "Name", nullable = false)
   private String name;
 
+  // App : AppNamespace = 1 : N
   @NotBlank(message = "AppId cannot be blank")
   @Column(name = "AppId", nullable = false)
   private String appId;
 
+  /**
+   *  @see com.ctrip.framework.apollo.core.enums.ConfigFileFormat
+    */
   @Column(name = "Format", nullable = false)
   private String format;
 
+  /**
+   * private 权限的 Namespace ，只能被所属的应用获取到
+   * public 权限的 Namespace ，能被任何应用获取。
+   */
   @Column(name = "IsPublic", columnDefinition = "Bit default '0'")
   private boolean isPublic = false;
 

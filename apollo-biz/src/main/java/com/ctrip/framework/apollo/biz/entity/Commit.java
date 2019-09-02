@@ -10,12 +10,20 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 
+/**
+ * 记录 Item 的 KV 变更历史
+ */
 @Entity
 @Table(name = "Commit")
 @SQLDelete(sql = "Update Commit set isDeleted = 1 where id = ?")
 @Where(clause = "isDeleted = 0")
 public class Commit extends BaseEntity {
 
+  /**
+   * 变更集合。
+   * appId + clusterName + namespaceName 字段，可以确认唯一 Namespace 记录。
+   * JSON 格式化，使用 {@link com.ctrip.framework.apollo.biz.utils.ConfigChangeContentBuilder} 生成
+   */
   @Lob
   @Column(name = "ChangeSets", nullable = false)
   private String changeSets;

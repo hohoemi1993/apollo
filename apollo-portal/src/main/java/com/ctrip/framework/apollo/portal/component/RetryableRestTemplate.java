@@ -32,13 +32,27 @@ import java.util.List;
 @Component
 public class RetryableRestTemplate {
 
+  /**
+   * 日志
+   */
   private Logger logger = LoggerFactory.getLogger(RetryableRestTemplate.class);
 
   private UriTemplateHandler uriTemplateHandler = new DefaultUriBuilderFactory();
 
   private RestTemplate restTemplate;
 
+  /**
+   * 单例的
+   * 实现了FactoryBean<RestTemplate>, InitializingBean接口
+   * 装配里注册在spring的 HttpMessageConverters
+   * 实际使用 HttpComponentsClientHttpRequestFactory 生产 RestTemplate 对象
+   * 注入了Portal配置的连接和超时时间
+   */
   private final RestTemplateFactory restTemplateFactory;
+
+  /**
+   * Admin服务地址定位器
+   */
   private final AdminServiceAddressLocator adminServiceAddressLocator;
 
   public RetryableRestTemplate(
@@ -87,6 +101,7 @@ public class RetryableRestTemplate {
     }
 
     String uri = uriTemplateHandler.expand(path, uriVariables).getPath();
+    // 包装了CAT CLIENT
     Transaction ct = Tracer.newTransaction("AdminAPI", uri);
     ct.addData("Env", env);
 
@@ -124,14 +139,18 @@ public class RetryableRestTemplate {
 
   private <T> ResponseEntity<T> exchangeGet(Env env, String path, ParameterizedTypeReference<T> reference,
                                             Object... uriVariables) {
+    // 去除开头 /
     if (path.startsWith("/")) {
       path = path.substring(1, path.length());
     }
-
+    // 变量们组装到uri上
     String uri = uriTemplateHandler.expand(path, uriVariables).getPath();
+    // 似乎是开启了一个事务
     Transaction ct = Tracer.newTransaction("AdminAPI", uri);
     ct.addData("Env", env);
 
+    // 返回的list中service已经被打乱了顺序
+    // 但是随即的意义在哪里呢
     List<ServiceDTO> services = getAdminServices(env, ct);
 
     for (ServiceDTO serviceDTO : services) {
@@ -147,6 +166,7 @@ public class RetryableRestTemplate {
         logger.error("Http request failed, uri: {}, method: {}", uri, HttpMethod.GET, t);
         Tracer.logError(t);
         if (canRetry(t, HttpMethod.GET)) {
+          // 重试
           Tracer.logEvent(TracerEventType.API_RETRY, uri);
         } else {// biz exception rethrow
           ct.setStatus(t);

@@ -123,6 +123,7 @@ public class AppNamespaceService {
       appNamespace.setComment("");
     }
 
+    // 校验 AppNamespace 的 `format` 是否合法
     if (!ConfigFileFormat.isValidFormat(appNamespace.getFormat())) {
      throw new BadRequestException("Invalid namespace format. format must be properties、json、yaml、yml、xml");
     }
@@ -135,10 +136,12 @@ public class AppNamespaceService {
 
     appNamespace.setDataChangeLastModifiedBy(operator);
 
+    // 公用类型，校验 `name` 在全局唯一
     // globally uniqueness check for public app namespace
     if (appNamespace.isPublic()) {
       checkAppNamespaceGlobalUniqueness(appNamespace);
     } else {
+      // 私有类型，校验 `name` 在 App 下唯一
       // check private app namespace
       if (appNamespaceRepository.findByAppIdAndName(appNamespace.getAppId(), appNamespace.getName()) != null) {
         throw new BadRequestException("Private AppNamespace " + appNamespace.getName() + " already exists!");

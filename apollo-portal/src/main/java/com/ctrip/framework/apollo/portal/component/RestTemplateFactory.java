@@ -16,36 +16,37 @@ import java.io.UnsupportedEncodingException;
 @Component
 public class RestTemplateFactory implements FactoryBean<RestTemplate>, InitializingBean {
 
-  @Autowired
-  private HttpMessageConverters httpMessageConverters;
-  @Autowired
-  private PortalConfig portalConfig;
+    @Autowired
+    private HttpMessageConverters httpMessageConverters;
 
-  private RestTemplate restTemplate;
+    @Autowired
+    private PortalConfig portalConfig;
 
-  public RestTemplate getObject() {
-    return restTemplate;
-  }
+    private RestTemplate restTemplate;
 
-  public Class<RestTemplate> getObjectType() {
-    return RestTemplate.class;
-  }
+    public RestTemplate getObject() {
+      return restTemplate;
+    }
 
-  public boolean isSingleton() {
-    return true;
-  }
+    public Class<RestTemplate> getObjectType() {
+      return RestTemplate.class;
+    }
 
-  public void afterPropertiesSet() throws UnsupportedEncodingException {
-    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+    public boolean isSingleton() {
+      return true;
+    }
 
-    restTemplate = new RestTemplate(httpMessageConverters.getConverters());
-    HttpComponentsClientHttpRequestFactory requestFactory =
-        new HttpComponentsClientHttpRequestFactory(httpClient);
-    requestFactory.setConnectTimeout(portalConfig.connectTimeout());
-    requestFactory.setReadTimeout(portalConfig.readTimeout());
+    public void afterPropertiesSet() throws UnsupportedEncodingException {
+      CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 
-    restTemplate.setRequestFactory(requestFactory);
-  }
+      restTemplate = new RestTemplate(httpMessageConverters.getConverters());
+      HttpComponentsClientHttpRequestFactory requestFactory =
+          new HttpComponentsClientHttpRequestFactory(httpClient);
+      requestFactory.setConnectTimeout(portalConfig.connectTimeout());
+      requestFactory.setReadTimeout(portalConfig.readTimeout());
+
+      restTemplate.setRequestFactory(requestFactory);
+    }
 
 
 }

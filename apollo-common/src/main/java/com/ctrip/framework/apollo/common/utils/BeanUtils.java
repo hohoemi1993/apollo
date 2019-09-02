@@ -1,20 +1,13 @@
 package com.ctrip.framework.apollo.common.utils;
 
 import com.ctrip.framework.apollo.common.exception.BeanUtilsException;
-
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.util.CollectionUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 public class BeanUtils {
@@ -38,7 +31,7 @@ public class BeanUtils {
   }
 
   /**
-   * 封装{@link org.springframework.beans.BeanUtils#copyProperties}，惯用与直接将转换结果返回
+   * 封装{@link org.springframework.beans.BeanUtils#copyProperties(Object, Object, String...)} ，惯用与直接将转换结果返回
    *
    * <pre>
    *      UserBean userBean = new UserBean("username");
@@ -61,6 +54,7 @@ public class BeanUtils {
 
   private static String[] getNullPropertyNames(Object source) {
     final BeanWrapper src = new BeanWrapperImpl(source);
+    // 对象的属性描述器
     PropertyDescriptor[] pds = src.getPropertyDescriptors();
 
     Set<String> emptyNames = new HashSet<>();
@@ -89,6 +83,7 @@ public class BeanUtils {
       return map;
     }
     try {
+    // 列表中对象的类型
       Class<?> clazz = list.get(0).getClass();
       Field field = deepFindField(clazz, key);
       if (field == null) throw new IllegalArgumentException("Could not find the key");
@@ -163,13 +158,16 @@ public class BeanUtils {
 
   private static Field deepFindField(Class<?> clazz, String key) {
     Field field = null;
+    // 查找到Object类为止
     while (!clazz.getName().equals(Object.class.getName())) {
       try {
         field = clazz.getDeclaredField(key);
         if (field != null) {
+        // 找到了
           break;
         }
       } catch (Exception e) {
+          // NoSuchFieldException 找不到就去找父类
         clazz = clazz.getSuperclass();
       }
     }

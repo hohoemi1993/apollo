@@ -110,20 +110,20 @@ public class AppController {
   @PreAuthorize(value = "@permissionValidator.hasCreateApplicationPermission()")
   @PostMapping
   public App create(@Valid @RequestBody AppModel appModel) {
-
+    // 对象转化 使用了建造者模式
     App app = transformToApp(appModel);
-
+    // 保存到了数据库
     App createdApp = appService.createAppInLocal(app);
-
+    // 发布了APP 创建事件
     publisher.publishEvent(new AppCreationEvent(createdApp));
-
+    // 授予APP 管理员角色
     Set<String> admins = appModel.getAdmins();
     if (!CollectionUtils.isEmpty(admins)) {
       rolePermissionService
           .assignRoleToUsers(RoleUtils.buildAppMasterRoleName(createdApp.getAppId()),
               admins, userInfoHolder.getUser().getUserId());
     }
-
+    // 返回App 对象
     return createdApp;
   }
 
@@ -133,9 +133,9 @@ public class AppController {
     if (!Objects.equals(appId, appModel.getAppId())) {
       throw new BadRequestException("The App Id of path variable and request body is different");
     }
-
+    // 对象转化 使用了建造者模式
     App app = transformToApp(appModel);
-
+    // 更新到数据库
     App updatedApp = appService.updateAppInLocal(app);
 
     publisher.publishEvent(new AppInfoChangedEvent(updatedApp));
